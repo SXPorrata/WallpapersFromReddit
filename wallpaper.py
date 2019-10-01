@@ -4,10 +4,16 @@ import glob
 import json
 import os
 import time
-import urllib2
+import urllib
+from pathlib import Path, PureWindowsPath
+# figure out why PIL can't be imported
 from PIL import Image
-import pwd
 import platform
+# pwd won't work on windows
+# if statement should work, but throwing error
+if platform.system() =="Darwin" or platform.system()=="Linux":
+    import pwd
+
 
 
 def parse_args():
@@ -35,13 +41,18 @@ def getOs():
     global directory
     global ops
     print("Inside getOs")
+    # change this to handle windows
     username = pwd.getpwuid(os.getuid()).pw_name
+    wallpaper_path = "/Users/" + username + "/Pictures/Wallpapers/"
     if platform.system()=="Darwin":
-        directory = "/Users/" + username + "/Pictures/Wallpapers/"
+        directory = wallpaper_path
         ops=1
     elif platform.system()=="Linux":
         directory = "/home/"+username+"/Wallpapers/"
         ops=0
+    elif platform.system() =="Windows":
+        directory = PureWindowsPath(wallpaper_path)
+        ops=2
 
 def removeUnwantedPhotos(listwallpaper):
     '''To remove non-jpg downloaded photos'''
@@ -100,7 +111,7 @@ def download(dCount):
 
         try:
 
-            print imurl
+            print(imurl)
 
             req = urllib2.Request(imurl+".jpg")
             time.sleep(2)
@@ -118,7 +129,7 @@ def download(dCount):
         except:
             pass
             time.sleep(2)
-    print dCount
+    print(dCount)
     return dCount
 
 
